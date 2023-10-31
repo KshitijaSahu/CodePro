@@ -15,6 +15,9 @@ function Compiler() {
     const [error, setError] = useState('');
     const [input, setInput] = useState('');
     const [mode, setMode] = useState('python')
+    const [filename, setFileName] = useState("");
+    const [Files, SetFiles] = useState([]);
+    const [currentFile, setCurrentFile] = useState("");
   
     const handleCompile = () => {
   
@@ -32,6 +35,19 @@ function Compiler() {
           setError(error.message);
         });
     };
+
+    const showFiles = () =>{
+      axios.post("http://localhost:4000/user/files",{
+        username : "Arijeet Sinha"
+      })
+      .then((res)=>{
+        // console.log(res.data);
+        SetFiles(res.data);
+      })
+      .catch((e)=>{
+        console.log("Error Showing files: ",e);
+      })
+    }
   
     useEffect(() => {
       switch (language) {
@@ -55,60 +71,135 @@ function Compiler() {
           break;
       }
     }, [language])
+
+    const handleFile = ()=>{
+      axios.post("http://localhost:4000/user/add",{
+        username : "Arijeet Sinha",
+        FileName : filename + "." + language,
+        Code : code,
+        Language : language
+      })
+      .then((res)=>{
+        alert(res.data.msg);
+        showFiles();
+      })
+      .catch((e)=>{
+        console.log("Error while adding file: ",e);
+      })
+    }
+  
+    const handleFiledDelete = (filename) =>{
+      axios.delete("http://localhost:4000/user/delete",{
+        data : {
+          username : "Arijeet Sinha",
+          FileName : filename
+        }
+      })
+      .then((res)=>{
+        alert(res.data.msg);
+        showFiles();
+      })
+      .catch((e)=>{
+        console.log(("Error While adding data: ",e));
+      })
+    }
+  
+    const handleCurrentFile =(current_code,file_name )=>{
+      setCode(current_code);
+      setCurrentFile(file_name);
+    }
+  
+    const EditFile =()=>{
+      axios.post("http://localhost:4000/user/updateFile",{
+        username : "Arijeet Sinha",
+        FileName : currentFile,
+        Code : code,
+        Language : language
+      })
+      .then((res)=>{
+        alert(res.data.msg);
+      })
+      .catch((e)=>{
+        console.log("Error while updating file:",e);
+      })
+    }
   
   return (
     
     <div >
-      <h1 className='text-center text-2xl font-bold '>Code Compiler</h1>
-      <div className='flex justify-between mx-10 mb-8 mt-2'>
-        <div >
-          <AceEditor
-            mode={mode}
-            theme='dracula'
-            height='500px'
-            width='800px'
-            setOptions={{
-              enableBasicAutocompletion: true,
-              enableLiveAutocompletion: true,
-              enableSnippets: true,
-              fontSize: 20,
-              showPrintMargin: false,
-            }}
-            onChange={(e) => setCode(e)}
-          />
+    <h1 className='text-center text-2xl font-bold '>Code Compiler</h1>
+    <div className='flex justify-between mx-10 mb-8 mt-2'>
+      <div>
+      <div id='headername'>
+      <h2>{currentFile}</h2>
+      { currentFile ? (<button onClick={EditFile}>Save Current File</button>):(<div></div>)}
+      </div>
+        <AceEditor
+          mode={mode}
+          theme='dracula'
+          height='500px'
+          width='800px'
+          setOptions={{
+            enableBasicAutocompletion: true,
+            enableLiveAutocompletion: true,
+            enableSnippets: true,
+            fontSize: 20,
+            showPrintMargin: false,
+          }}
+          value={code}
+          onChange={(e) => setCode(e)}
+        />
+      </div>
+      <div>
+        <select onChange={(e) => setLanguage(e.target.value)} name='language'>
+          <option value="py">Python</option>
+          <option value="c">C</option>
+          <option value="cpp">C++</option>
+          <option value="cs">C#</option>
+          <option value="java">Java</option>
+          <option value="js">Javascript</option>
+          <option value="go">Golang</option>
+        </select>
+        <button onClick={handleCompile}>Compile</button><br />
+        <label htmlFor='code-input'>Input </label>
+        <textarea
+          id='code-input'
+          type='text'
+          placeholder='Enter input If required'
+          value={input}
+          onChange={(event) => setInput(event.target.value)}
+        />
+        <div>
+          <h2>Output:</h2>
+          <pre>{output}</pre>
         </div>
         <div>
-          <select onChange={(e) => setLanguage(e.target.value)} name='language'>
-            <option value="py">Python</option>
-            <option value="c">C</option>
-            <option value="cpp">C++</option>
-            <option value="cs">C#</option>
-            <option value="java">Java</option>
-            <option value="js">Javascript</option>
-            <option value="go">Golang</option>
-          </select>
-
-          <button onClick={handleCompile}>Compile</button><br />
-
-          <label htmlFor='code-input'>Input </label>
-          <textarea
-            id='code-input'
+          <h2>Error:</h2>
+          <pre>{error}</pre>
+        </div>
+        <div>
+          <input 
+            id="filename"
             type='text'
-            placeholder='Enter Input if required'
-            value={input}
-            onChange={(event) => setInput(event.target.value)}
+            placeholder='Enter File Name'
+            value={filename}
+            onChange={(event)=>setFileName(event.target.value)}
           />
-          <div>
-            <h2>Output:</h2>
-            <pre>{output}</pre>
-          </div>
-          <div>
-            <h2>Error:</h2>
-            <pre>{error}</pre>
-          </div>
+          <button onClick={handleFile}>Save</button>
+        </div>
+        <div>
+          <div className='cursor-pointer' id="click-obj" onClick={showFiles}>Show Files</div>
+          {Files.map((item)=>(
+            <div key={item._id}>
+              <div id='click-obj' onClick={()=>handleCurrentFile(item.Code,item.FileName)}>{item.FileName}
+                <button onClick={()=>handleFiledDelete(item.FileName)}>delete</button>
+              </div>
+            </div>
+          ))}
         </div>
       </div>
     </div>
+  </div>
   )
 }
 
