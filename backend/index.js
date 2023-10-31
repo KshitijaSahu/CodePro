@@ -1,3 +1,4 @@
+const http = require('http');
 require('dotenv').config();
 const mongoose = require('mongoose');
 const express = require('express');
@@ -67,8 +68,9 @@ mongoose.connect(process.env.MONGO_URL, {
 
 app.use("/user", file);   // File system updated
 
+const server = http.createServer(app);
   
-  
-app.listen(port, () => {
+server.listen(port, () => {
   console.log(`Serve at http://localhost:${port}`)
 })
+
