@@ -21,7 +21,7 @@ function Home() {
                     The <span className='text-gray-600'> Coolest </span> 
                     coding platform in India.</h1>
 
-                    <p className='text-[1.2vw] font-bold text-gray-800 w-4/5 my-[3vw]'>Lorem ipsum dolor sit amet consectetur adipisicing elit. Itaque natus beatae esse explicabo dignissimos enim, molestiae qui consequatur delectus sed.dolor sit amet consectetur adipisicing elit. Itaque natus beatae esse explicabo dignissimos enim, molestiae qui consequatur delectus sed.</p>
+                    <p className='text-[1.2vw] font-bold text-gray-800 w-4/5 my-[3vw]'>Welcome to CodePro - your goto IDLE. Explore a multitude of supported programming languages in the most secure and user-friendly environment.  Write and compile code with confidence, and enjoy the convenience of saving your progress. Your coding journey just got safer and more efficient.</p>
 
                     <button
                     onClick={()=> {
